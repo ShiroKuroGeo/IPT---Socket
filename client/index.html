@@ -10,6 +10,7 @@
         crossorigin="anonymous"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/style.css">
     <style>
         #chat3 .form-control {
             border-color: transparent;
@@ -57,7 +58,7 @@
 </head>
 
 <body>
-    <div class="container vh-100">
+    <div class="container d-flex justify-content-center align-items-center vh-100">
         <section style="background-color: #CDC4F9;">
             <div class="container py-5">
 
@@ -66,15 +67,15 @@
 
                         <div class="card" id="chat3" style="border-radius: 15px;">
                             <div class="card-body">
-
                                 <div class="row">
-                                    <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0">
+                                    <div class="col-md-6 col-lg-5 col-xl-4 mb-4 mb-md-0"
+                                        style="border-radius: 25px;">
 
                                         <div class="p-3">
-
                                             <div class="input-group rounded mb-3">
-                                                <input type="search" class="form-control rounded" placeholder="Search"
-                                                    aria-label="Search" aria-describedby="search-addon" />
+                                                <input type="search" id="searchData" class="form-control form-control-md rounded border"
+                                                    placeholder="Search" aria-label="Search"
+                                                    aria-describedby="search-addon" />
                                                 <span class="input-group-text border-0" id="search-addon">
                                                     <i class="fas fa-search"></i>
                                                 </span>
@@ -91,8 +92,14 @@
                                     </div>
 
                                     <div class="col-md-6 col-lg-7 col-xl-8">
+                                        <div class="profileOfReceiver p-2 border-bottom border-4 border-secondary my-2">
+                                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
+                                                alt="avatar 1" style="width: 35px; height: 100%;">
+                                            Name of User
+                                        </div>
                                         <div class="pt-3 pe-3 scrollable-element" id="messages"
                                             style="position: relative; height: 400px">
+
                                             <!-- Receiver -->
                                             <div class="d-flex flex-row justify-content-start">
                                                 <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
@@ -117,7 +124,11 @@
                                                 alt="avatar 3" style="width: 40px; height: 100%;">
                                             <input type="text" id="message" class="border form-control form-control-lg"
                                                 placeholder="Type message">
-                                            <button class="btn btn-sm btn-lg" id="send">Send Message</button>
+                                            <button id="send" class="btn ms-2 border" style="padding: 10px; height: 40px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="20" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
+                                                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm6.787-8.201L1.591 6.602l4.339 2.76 7.494-7.493Z"/>
+                                                </svg>
+                                            </button>
                                         </div>
 
                                     </div>
@@ -132,6 +143,8 @@
             </div>
         </section>
     </div>
+    <script src="/jquery.js"></script>
+    <script src="/toastr.js"></script>
     <script>
 
         const socket = io();
@@ -142,21 +155,18 @@
             var Months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
             var currentDay = new Date();
 
-            span.innerHTML = `<div class="d-flex flex-row justify-content-end">
-                                <div>
-                                    <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">${message}</p>
-                                    <p class="small me-3 mb-3 rounded-3 text-muted">${parseInt(currentDay.getHours() / 2)}:${currentDay.getMinutes()} PM | ${Months[currentDay.getMonth()]} ${currentDay.getDay()}</p>
-                                </div>
-                                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp"
-                                                    alt="avatar 1" style="width: 45px; height: 100%;">
-                            </div>`;
+            span.innerHTML = `<div class="d-flex flex-row justify-content-end"> <div> <p class="small p-2 me-3 mb-1 text-white rounded-3 bg-primary">${message}</p> <p class="small me-3 mb-3 rounded-3 text-muted">${parseInt(currentDay.getHours() / 2)}:${currentDay.getMinutes()} PM | ${Months[currentDay.getMonth()]} ${currentDay.getDay()}</p> </div> <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava6-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;"> </div>`;
 
             document.querySelector("#messages").appendChild(span);
         });
 
         document.querySelector("#send").addEventListener("click", () => {
             const msg = document.querySelector("#message").value;
-            socket.emit("chat message", msg);
+            if (msg != '') {
+                toastr.success('Send');
+                socket.emit("chat message", msg);
+                document.querySelector("#message").value = '';
+            }
         });
     </script>
     <script>
@@ -165,51 +175,22 @@
         socket.on("add Users", (newUser) => {
 
             const userItem = document.createElement("span");
-            userItem.innerHTML = `<li class="p-2 border-bottom">
-                        <a href="#!" class="d-flex justify-content-between">
-                          <div class="d-flex flex-row">
-                            <div>
-                              <img
-                                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                                alt="avatar" class="d-flex align-self-center me-3" width="60">
-                              <span class="badge bg-success badge-dot"></span>
-                            </div>
-                            <div class="pt-1">
-                              <p class="fw-bold mb-0">${newUser.username}</p>
-                              <p class="small text-muted">Hello, Are you there?</p>
-                            </div>
-                          </div>
-                        </a>
-                        </li>`;
+            userItem.innerHTML = `<li class="p-2 border-bottom"> <a href="#!" class="d-flex justify-content-between"> <div class="d-flex flex-row"> <div> <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar" class="d-flex align-self-center me-3" width="60"> <span class="badge bg-success badge-dot"></span> </div> <div class="pt-1"> <p class="fw-bold mb-0">${newUser.username}</p> <p class="small text-muted">Hello, Are you there?</p> </div> </div> </a> </li>`;
             userList.appendChild(userItem);
         });
         const searchParams = new URLSearchParams(window.location.search);
 
-        fetch("/chat-data/"+ searchParams.get('id'))
+        fetch("/chat-data/" + searchParams.get('id'))
             .then(response => response.json())
             .then(data => {
                 const userDataElement = document.getElementById("usersFromChat");
                 let userDataHTML = ``;
 
                 data.forEach(user => {
-                    userDataHTML += `<li class="p-2 border-bottom">
-                        <a href="#!" class="d-flex justify-content-between">
-                          <div class="d-flex flex-row">
-                            <div>
-                              <img
-                                src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp"
-                                alt="avatar" class="d-flex align-self-center me-3" width="60">
-                              <span class="badge bg-success badge-dot"></span>
-                            </div>
-                            <div class="pt-1">
-                              <p class="fw-bold mb-0">${user.username}</p>
-                              <p class="small text-muted">Hello, Are you there?</p>
-                            </div>
-                          </div>
-                        </a>
-                        </li>`;
+                    userDataHTML += `<li class="p-2 border-bottom"> <a href="#!" class="d-flex justify-content-between"> <div class="d-flex flex-row"> <div> <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava1-bg.webp" alt="avatar" class="d-flex align-self-center me-3" width="60"> <span class="badge bg-success badge-dot"></span> </div> <div class="pt-1"> <p class="fw-bold mb-0">${user.username}</p> <p class="small text-muted">Hello, Are you there?</p> </div> </div> </a> </li>`;
                 });
                 userDataElement.innerHTML = userDataHTML;
+
             })
             .catch(error => {
                 console.error("Error fetching data:", error);
