@@ -5,6 +5,5 @@ Members:
   ->Igot, Jeffrey
   ->Tabornal, April
   ->Cahayagan, Jinny
-  ->Degamo, Locel
   ->Respuesto, Ferbe Marie
   ->Yaguno, Christian Jhun
